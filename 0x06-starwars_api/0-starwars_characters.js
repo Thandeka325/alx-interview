@@ -1,5 +1,6 @@
 #!/usr/bin/node
-/* Script prints all characters of a Star Wars movie by Movie ID using the Star Wars API */
+/* Prints all characters of a Star Wars movie in order using the SWAPI */
+
 const request = require('request');
 
 const movieId = process.argv[2];
@@ -15,17 +16,24 @@ request(apiUrl, (err, res, body) => {
     console.error(err);
     return;
   }
-  const filmData = JSON.parse(body);
-  const characters = filmData.characters;
 
-  characters.forEach((characterUrl) => {
-    request(characterUrl, (charErr, charRes, charBody) => {
+  const film = JSON.parse(body);
+  const characters = film.characters;
+
+  const printCharacter = (index) => {
+    if (index >= characters.length) return;
+
+    request(characters[index], (charErr, charRes, charBody) => {
       if (charErr) {
         console.error(charErr);
         return;
       }
-      const characterData = JSON.parse(charBody);
-      console.log(characterData.name);
+
+      const character = JSON.parse(charBody);
+      console.log(character.name);
+      printCharacter(index + 1);
     });
-  });
+  };
+
+  printCharacter(0);
 });
